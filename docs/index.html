@@ -1,0 +1,78 @@
+<html lang="ja">
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="description" content="">
+  <link rel="stylesheet" href="vendor/@fortawesome/fontawesome-free/css/all.min.css">
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+  <title>トップページ</title>
+  <style>
+  body {padding: 0; margin: 0}
+  html, body, #map {height: 100%; width: 100%;}
+</style>
+</head>
+<body>
+  <div id="map"></div>
+  <script src="vendor/jquery/jquery.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="vendor/leaflet/leaflet.js"></script>
+  <script>
+    var map = L.map('map').setView([35.014383, 135.747676], 13);
+    var LeafIcon = L.Icon.extend({
+        options: {
+            shadowUrl: 'images/icons/icon-shadow.png',
+            iconSize:     [48, 60],
+            shadowSize:   [100, 90],
+            iconAnchor:   [24, 50],
+            shadowAnchor: [30, 50],
+            popupAnchor:  [0, -40]
+        }
+    });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+ 
+ 
+    $.when(
+      $.getJSON('data/route.json'),
+      $.getJSON('data/markeres.json'),
+      $.getJSON('data/train-route.json')
+    ).done(function(route, markeres, train) {
+      addMarkeres(markeres);
+      addTrainLines(route, train);
+    });
+ 
+    function addMarkeres(markeres) {
+      var trainIcon = new LeafIcon({iconUrl: 'images/icons/icon-train.svg'});
+      var shrineIcon = new LeafIcon({iconUrl: 'images/icons/icon-shrine.svg'});
+      var templeIcon = new LeafIcon({iconUrl: 'images/icons/icon-temple.svg'});
+      var castleIcon = new LeafIcon({iconUrl: 'images/icons/icon-castle.svg'});
+      var mealIcon = new LeafIcon({iconUrl: 'images/icons/icon-meal.svg'});
+      var iconList = [trainIcon, shrineIcon, templeIcon, castleIcon, mealIcon]
+      L.icon = function (options) {
+        return new L.Icon(options);
+      };
+      markeres[0].forEach(item => {
+        L.marker(item.point, {icon: iconList[item.icon]}).addTo(map).bindPopup(item.text);  
+      });
+    }
+ 
+    function addTrainLines(route, trainRoute) {
+      trainRoute[0].forEach(line =>{
+        var pointsArray = [];
+        line.points.forEach(e =>{
+          var q = route[0].filter(function (ele) {
+            return ele.pointId == e;
+          });
+          pointsArray.push(q[0].points);
+        });
+        L.polyline(pointsArray, {color: line.color}).addTo(map);
+      });
+    }
+ 
+    
+  </script>
+</body>
+</html>
