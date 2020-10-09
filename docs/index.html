@@ -2,14 +2,14 @@
 <head>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="format-detection" content="telephone=no">
   <meta name="description" content="">
   <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
-  <title>トップページ</title>
+  <title>京都マップ</title>
   <style>
   body {padding: 0; margin: 0}
-  html, body, #map {height: 100%; width: 100%;}
+  html, body, #map {height: 100%; width: 100vw}
 </style>
 </head>
 <body>
@@ -17,7 +17,9 @@
   <script src="vendor/jquery/jquery.min.js"></script>
   <script src="vendor/leaflet/leaflet.js"></script>
   <script>
-    var map = L.map('map').setView([35.014383, 135.747676], 13);
+    var map = L.map('map', {
+      closePopupOnClick: false
+    }).setView([35.014383, 135.747676], 13);
     var LeafIcon = L.Icon.extend({
         options: {
             shadowUrl: 'images/icons/icon-shadow.png',
@@ -53,7 +55,7 @@
         return new L.Icon(options);
       };
       markeres[0].forEach(item => {
-        L.marker(item.point, {icon: iconList[item.icon]}).addTo(map).bindPopup(item.text).openPopup();
+        L.marker(item.point, {icon: iconList[item.icon]}).addTo(map).bindPopup(item.text);
       });
     }
  
